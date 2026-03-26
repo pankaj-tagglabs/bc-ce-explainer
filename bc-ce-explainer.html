@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BC &amp; CE — A Visual Guide to Calendar Eras</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0e0c;
+    --bg2: #1a1815;
+    --bg3: #231f1b;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #7a6430;
+    --blue: #4a8db5;
+    --blue-dim: #2a5270;
+    --blue-light: #7ab8d8;
+    --green: #5a9e72;
+    --green-dim: #2d5e3f;
+    --green-light: #88c89e;
+    --text: #e8e4dc;
+    --text-dim: #9a9086;
+    --text-muted: #5c5650;
+    --border: rgba(201,168,76,0.18);
+    --border-dim: rgba(255,255,255,0.06);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+
+  /* ── Grain overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.5;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    padding: 100px 40px 80px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.1s forwards;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 90px);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.2s forwards;
+  }
+  .hero h1 em { color: var(--gold); font-style: italic; }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin: 0 auto 40px;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.35s forwards;
+  }
+  .hero-divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 0 auto;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.5s forwards;
+  }
+
+  /* ── Page layout ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ── Sections ── */
+  section { padding: 72px 0; border-bottom: 1px solid var(--border-dim); }
+  section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 400;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .section-title em { color: var(--gold); font-style: italic; }
+  .prose {
+    font-size: 16px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    max-width: 680px;
+  }
+  .prose + .prose { margin-top: 14px; }
+  .prose strong { color: var(--text); font-weight: 500; }
+
+  /* ── Timeline ── */
+  .timeline-wrap {
+    margin-top: 40px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px 28px;
+    overflow: hidden;
+    position: relative;
+  }
+  .timeline-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% -10%, rgba(201,168,76,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .tl-axis {
+    position: relative;
+    height: 60px;
+    margin: 16px 0;
+  }
+  .tl-line {
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, var(--blue-dim), var(--border), var(--gold), var(--border), var(--green-dim));
+  }
+  .tl-anchor {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.2), 0 0 20px rgba(201,168,76,0.4);
+    z-index: 2;
+  }
+  .tl-tick {
+    position: absolute;
+    top: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px;
+  }
+  .tl-tick-line { width: 1px; height: 12px; margin-top: -6px; }
+  .tl-tick-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .tl-era-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 5px 0;
+  }
+  .bc-era { color: var(--blue-light); }
+  .ce-era { color: var(--green-light); }
+
+  .tl-arrow-bc {
+    position: absolute;
+    left: 4%; top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--blue-dim);
+    font-family: 'DM Mono', monospace;
+  }
+  .tl-arrow-ce {
+    position: absolute;
+    right: 4%; top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--green-dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── Terms grid ── */
+  .terms-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 36px;
+  }
+  @media (max-width: 560px) { .terms-grid { grid-template-columns: 1fr; } }
+  .term-card {
+    background: var(--bg2);
+    border-radius: var(--radius-lg);
+    padding: 24px 22px;
+    border: 1px solid var(--border-dim);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .term-card:hover { border-color: var(--border); }
+  .term-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .term-card.bc::before { background: linear-gradient(to right, transparent, var(--blue), transparent); }
+  .term-card.ce::before { background: linear-gradient(to right, transparent, var(--green), transparent); }
+  .term-acronym {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1;
+  }
+  .term-card.bc .term-acronym { color: var(--blue-light); }
+  .term-card.ce .term-acronym { color: var(--green-light); }
+  .term-full {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    font-weight: 300;
+  }
+  .term-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+  .term-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .term-card.bc .term-badge { background: rgba(74,141,181,0.12); color: var(--blue-light); border: 1px solid rgba(74,141,181,0.2); }
+  .term-card.ce .term-badge { background: rgba(90,158,114,0.12); color: var(--green-light); border: 1px solid rgba(90,158,114,0.2); }
+
+  /* ── Year Zero callout ── */
+  .callout {
+    margin-top: 36px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .callout::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+    border-radius: 0 2px 2px 0;
+  }
+  .callout-icon {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+  .callout-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+  .callout-body { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+
+  /* ── Zero visual ── */
+  .zero-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-top: 32px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .yr-box {
+    min-width: 72px; padding: 10px 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-dim);
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .yr-box.bc-box { background: rgba(74,141,181,0.08); border-color: rgba(74,141,181,0.2); }
+  .yr-box.ce-box { background: rgba(90,158,114,0.08); border-color: rgba(90,158,114,0.2); }
+  .yr-box.zero-box { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.3); border-style: dashed; }
+  .yr-box-num { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; }
+  .yr-box.bc-box .yr-box-num { color: var(--blue-light); }
+  .yr-box.ce-box .yr-box-num { color: var(--green-light); }
+  .yr-box.zero-box .yr-box-num { color: var(--gold); }
+  .yr-box-era { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-family: 'DM Mono', monospace; }
+  .yr-arrow {
+    font-size: 16px;
+    color: var(--text-muted);
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* ── Interactive Explorer ── */
+  .explorer-wrap {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 620px) { .explorer-wrap { grid-template-columns: 1fr; } }
+  .exp-panel {
+    background: var(--bg2);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg);
+    padding: 24px 22px;
+  }
+  .exp-panel-title {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .exp-number-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    padding: 14px 16px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  .exp-number-input::-webkit-outer-spin-button,
+  .exp-number-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .exp-number-input:focus { border-color: var(--gold-dim); }
+  .era-toggle {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .era-btn {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-dim);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .era-btn:hover { background: var(--bg3); }
+  .era-btn.active-bc { background: rgba(74,141,181,0.15); color: var(--blue-light); border-color: rgba(74,141,181,0.35); }
+  .era-btn.active-ce { background: rgba(90,158,114,0.15); color: var(--green-light); border-color: rgba(90,158,114,0.35); }
+  .exp-result {
+    margin-top: 18px;
+    background: var(--bg3);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    min-height: 80px;
+  }
+  .exp-result strong { color: var(--text); font-weight: 500; }
+  .exp-result .highlight { color: var(--gold); font-weight: 500; }
+
+  /* Events panel */
+  .events-scroll {
+    max-height: 280px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg3) transparent;
+  }
+  .evt-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-dim);
+    background: var(--bg3);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    width: 100%;
+  }
+  .evt-chip:hover { border-color: var(--gold-dim); background: rgba(201,168,76,0.04); }
+  .evt-yr {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    min-width: 52px;
+    flex-shrink: 0;
+  }
+  .evt-chip.bc-chip .evt-yr { color: var(--blue-light); }
+  .evt-chip.ce-chip .evt-yr { color: var(--green-light); }
+  .evt-name { font-size: 12px; color: var(--text-dim); line-height: 1.3; }
+
+  /* Distance calculator */
+  .dist-calc {
+    margin-top: 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg);
+    padding: 24px 22px;
+  }
+  .dist-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .dist-field { display: flex; flex-direction: column; gap: 6px; }
+  .dist-label { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-muted); letter-spacing: 0.12em; }
+  .dist-inputs { display: flex; gap: 6px; }
+  .dist-num {
+    width: 80px;
+    background: var(--bg3);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  .dist-num::-webkit-outer-spin-button,
+  .dist-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .dist-num:focus { border-color: var(--gold-dim); }
+  .dist-select {
+    background: var(--bg3);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 8px 8px;
+    outline: none;
+    cursor: pointer;
+  }
+  .dist-sep { font-size: 18px; color: var(--text-muted); padding-bottom: 8px; }
+  .calc-btn {
+    padding: 9px 20px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius);
+    color: var(--gold-light);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    flex-shrink: 0;
+  }
+  .calc-btn:hover { background: rgba(201,168,76,0.18); }
+  .dist-result {
+    margin-top: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    min-height: 22px;
+  }
+  .dist-result .big-num { font-size: 28px; color: var(--gold); font-weight: 500; }
+
+  /* ── Cultures ── */
+  .cultures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 36px;
+  }
+  .culture-card {
+    background: var(--bg2);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg);
+    padding: 20px 18px;
+    transition: border-color 0.2s;
+  }
+  .culture-card:hover { border-color: var(--gold-dim); }
+  .culture-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .culture-yr {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .culture-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border-dim);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .footer-inner { max-width: 860px; margin: 0 auto; }
+  .footer-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .footer-sub { font-size: 13px; color: var(--text-muted); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="page">
+    <p class="hero-eyebrow">A visual explainer</p>
+    <h1>Before &amp; <em>After</em></h1>
+    <p class="hero-sub">How humanity decided to number years — the story of BC, CE, and the missing year zero.</p>
+    <div class="hero-divider"></div>
+  </div>
+</header>
+
+<main>
+
+<!-- SECTION 1: The Anchor -->
+<section>
+  <div class="page">
+    <div class="reveal">
+      <p class="section-label">01 — The concept</p>
+      <h2 class="section-title">Every calendar needs an <em>anchor</em></h2>
+      <p class="prose">All year-numbering systems need a fixed reference point — a moment declared "year one" from which all other years are counted. The BC/CE system chose the <strong>estimated birth year of Jesus of Nazareth</strong> as that anchor, calculated in 525 CE by a monk named Dionysius Exiguus.</p>
+      <p class="prose">From that anchor, years radiate outward in both directions. Going forward in time, years count upwards (1 CE, 2 CE, 3 CE…). Going backward in time, years also count upwards — which is where the confusion begins.</p>
+    </div>
+
+    <div class="reveal timeline-wrap" style="margin-top: 40px;">
+      <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+        <span class="tl-era-label bc-era">← BC / BCE &nbsp; counts backwards</span>
+        <span class="tl-era-label ce-era">AD / CE counts forwards →</span>
+      </div>
+      <div class="tl-axis">
+        <div class="tl-line"></div>
+        <div class="tl-anchor" style="left:50%;"></div>
+        <!-- BC ticks -->
+        <div class="tl-tick" style="left:10%;">
+          <div class="tl-tick-line" style="background:var(--blue-dim);"></div>
+          <div class="tl-tick-label" style="color:var(--blue-dim); margin-top: 28px;">500 BC</div>
+        </div>
+        <div class="tl-tick" style="left:28%;">
+          <div class="tl-tick-line" style="background:var(--blue-dim);"></div>
+          <div class="tl-tick-label" style="color:var(--blue-dim); margin-top: 28px;">100 BC</div>
+        </div>
+        <div class="tl-tick" style="left:43%;">
+          <div class="tl-tick-line" style="background:var(--blue-dim);"></div>
+          <div class="tl-tick-label" style="color:var(--blue-dim); margin-top: 28px;">10 BC</div>
+        </div>
+        <!-- CE ticks -->
+        <div class="tl-tick" style="left:57%;">
+          <div class="tl-tick-line" style="background:var(--green-dim);"></div>
+          <div class="tl-tick-label" style="color:var(--green-dim); margin-top: 28px;">10 CE</div>
+        </div>
+        <div class="tl-tick" style="left:72%;">
+          <div class="tl-tick-line" style="background:var(--green-dim);"></div>
+          <div class="tl-tick-label" style="color:var(--green-dim); margin-top: 28px;">100 CE</div>
+        </div>
+        <div class="tl-tick" style="left:90%;">
+          <div class="tl-tick-line" style="background:var(--green-dim);"></div>
+          <div class="tl-tick-label" style="color:var(--green-dim); margin-top: 28px;">500 CE</div>
+        </div>
+        <!-- Anchor label -->
+        <div class="tl-tick" style="left:50%; top: -24px;">
+          <div class="tl-tick-label" style="color:var(--gold); font-size: 10px;">anchor</div>
+        </div>
+      </div>
+      <p style="text-align:center; font-size: 12px; color: var(--text-muted); margin-top: 8px; font-family: 'DM Mono', monospace;">In BC, larger numbers = older. 500 BC is far more ancient than 10 BC.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: The Four Terms -->
+<section>
+  <div class="page">
+    <div class="reveal">
+      <p class="section-label">02 — Terminology</p>
+      <h2 class="section-title">Four terms, <em>two meanings</em></h2>
+      <p class="prose">The system has two naming conventions — one religious, one secular. The years themselves are identical; only the framing differs. 44 BC and 44 BCE are the exact same year.</p>
+    </div>
+
+    <div class="terms-grid reveal">
+      <div class="term-card bc">
+        <div class="term-acronym">BC</div>
+        <div class="term-full">Before Christ</div>
+        <div class="term-desc">Years before the anchor. Counts backwards — a larger number means an older date. The Roman Empire fell in 476 CE; Julius Caesar was assassinated in 44 BC.</div>
+        <span class="term-badge">= BCE in secular use</span>
+      </div>
+      <div class="term-card ce">
+        <div class="term-acronym">AD</div>
+        <div class="term-full">Anno Domini — "In the year of the Lord"</div>
+        <div class="term-desc">Years after the anchor. Counts forwards normally. Uniquely, AD traditionally precedes the year: "AD 476" — because it is a Latin phrase, not a suffix.</div>
+        <span class="term-badge">= CE in secular use</span>
+      </div>
+      <div class="term-card bc">
+        <div class="term-acronym">BCE</div>
+        <div class="term-full">Before Common Era</div>
+        <div class="term-desc">The secular equivalent of BC. Adopted by academia, science, and interfaith contexts to remove religious framing while keeping identical year numbers.</div>
+        <span class="term-badge">= BC in traditional use</span>
+      </div>
+      <div class="term-card ce">
+        <div class="term-acronym">CE</div>
+        <div class="term-full">Common Era</div>
+        <div class="term-desc">The secular equivalent of AD. Now standard in archaeology, history, and most scientific literature. Follows the year as a suffix, unlike AD.</div>
+        <span class="term-badge">= AD in traditional use</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: Missing Zero -->
+<section>
+  <div class="page">
+    <div class="reveal">
+      <p class="section-label">03 — The quirk</p>
+      <h2 class="section-title">There is no <em>Year Zero</em></h2>
+      <p class="prose">When Dionysius designed the calendar in 525 CE, he used Roman numerals — and Romans had no concept of zero. The calendar skips directly from 1 BC to 1 CE, a gap of just one year, not two.</p>
+    </div>
+
+    <div class="zero-row reveal">
+      <div class="yr-box bc-box"><div class="yr-box-num">3 BC</div><div class="yr-box-era">older</div></div>
+      <div class="yr-arrow">→</div>
+      <div class="yr-box bc-box"><div class="yr-box-num">2 BC</div><div class="yr-box-era"></div></div>
+      <div class="yr-arrow">→</div>
+      <div class="yr-box bc-box"><div class="yr-box-num">1 BC</div><div class="yr-box-era"></div></div>
+      <div class="yr-arrow">→</div>
+      <div class="yr-box zero-box"><div class="yr-box-num">Year 0</div><div class="yr-box-era" style="color:var(--gold-dim);">missing</div></div>
+      <div class="yr-arrow">→</div>
+      <div class="yr-box ce-box"><div class="yr-box-num">1 CE</div><div class="yr-box-era"></div></div>
+      <div class="yr-arrow">→</div>
+      <div class="yr-box ce-box"><div class="yr-box-num">2 CE</div><div class="yr-box-era"></div></div>
+      <div class="yr-arrow">→</div>
+      <div class="yr-box ce-box"><div class="yr-box-num">3 CE</div><div class="yr-box-era">newer</div></div>
+    </div>
+
+    <div class="callout reveal">
+      <div class="callout-icon">∅</div>
+      <div class="callout-title">Astronomers fix this with Year 0</div>
+      <div class="callout-body">To make arithmetic clean, astronomers use their own system where Year 0 exists and equals 1 BC. In astronomical notation: 1 BC = 0, 2 BC = −1, 3 BC = −2, and so on. This means calculating the span between two dates is a simple subtraction — no special casing needed for the BC/CE boundary.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: Interactive Explorer -->
+<section>
+  <div class="page">
+    <div class="reveal">
+      <p class="section-label">04 — Explore</p>
+      <h2 class="section-title">Year <em>explorer</em></h2>
+      <p class="prose">Enter any year and era to see how it fits in history, or tap a famous event to load it.</p>
+    </div>
+
+    <div class="explorer-wrap reveal">
+      <!-- Input panel -->
+      <div class="exp-panel">
+        <div class="exp-panel-title">Enter a year</div>
+        <input type="number" class="exp-number-input" id="yr-input" min="1" max="9999" value="44">
+        <div class="era-toggle">
+          <button class="era-btn active-bc" id="btn-bc" onclick="setEra('BC')">BC / BCE</button>
+          <button class="era-btn" id="btn-ce" onclick="setEra('CE')">AD / CE</button>
+        </div>
+        <div class="exp-result" id="yr-result"></div>
+      </div>
+
+      <!-- Events panel -->
+      <div class="exp-panel">
+        <div class="exp-panel-title">Famous years</div>
+        <div class="events-scroll" id="events-list"></div>
+      </div>
+    </div>
+
+    <!-- Distance calculator -->
+    <div class="dist-calc reveal">
+      <div class="exp-panel-title">Years between two events</div>
+      <div class="dist-row">
+        <div class="dist-field">
+          <span class="dist-label">Year A</span>
+          <div class="dist-inputs">
+            <input type="number" class="dist-num" id="dA" min="1" value="44">
+            <select class="dist-select" id="eA"><option value="BC">BC</option><option value="CE">CE</option></select>
+          </div>
+        </div>
+        <div class="dist-sep">→</div>
+        <div class="dist-field">
+          <span class="dist-label">Year B</span>
+          <div class="dist-inputs">
+            <input type="number" class="dist-num" id="dB" min="1" value="1969">
+            <select class="dist-select" id="eB"><option value="BC">BC</option><option value="CE" selected>CE</option></select>
+          </div>
+        </div>
+        <button class="calc-btn" onclick="calcDist()">Calculate →</button>
+      </div>
+      <div class="dist-result" id="dist-result"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: Other Cultures -->
+<section>
+  <div class="page">
+    <div class="reveal">
+      <p class="section-label">05 — Global perspective</p>
+      <h2 class="section-title">Other cultures, other <em>anchors</em></h2>
+      <p class="prose">The BC/CE system is not universal. It became a global standard largely through trade and colonialism. Many civilisations use parallel calendars with entirely different anchor points — some still in active official or ceremonial use today.</p>
+    </div>
+
+    <div class="cultures-grid reveal">
+      <div class="culture-card">
+        <div class="culture-name">Islamic (Hijri)</div>
+        <div class="culture-yr" id="yr-hijri">1446 AH</div>
+        <div class="culture-desc">Year 1 = 622 CE. The anchor is Muhammad's migration from Mecca to Medina. Uses a lunar calendar of 354–355 days, so it drifts ~11 days per Gregorian year.</div>
+      </div>
+      <div class="culture-card">
+        <div class="culture-name">Hebrew</div>
+        <div class="culture-yr" id="yr-hebrew">5785 AM</div>
+        <div class="culture-desc">Counts from a calculated date of creation. <em>Anno Mundi</em> — "year of the world." A lunisolar calendar that adds a leap month 7 times in 19 years.</div>
+      </div>
+      <div class="culture-card">
+        <div class="culture-name">Indian (Saka Era)</div>
+        <div class="culture-yr" id="yr-saka">1946 SE</div>
+        <div class="culture-desc">Begins 78 CE. India's official national calendar alongside the Gregorian system. Used for gazette publications and government communications.</div>
+      </div>
+      <div class="culture-card">
+        <div class="culture-name">Japanese (Reiwa)</div>
+        <div class="culture-yr" id="yr-reiwa">Reiwa 7</div>
+        <div class="culture-desc">Resets with each emperor's reign. The current era, <em>Reiwa</em>, began May 1, 2019 CE. Japan uses both the imperial era system and Gregorian years in parallel.</div>
+      </div>
+      <div class="culture-card">
+        <div class="culture-name">Chinese</div>
+        <div class="culture-yr">Year 4722</div>
+        <div class="culture-desc">References the legendary Yellow Emperor (~2697 BC). A complex lunisolar system. The Chinese New Year falls on a different Gregorian date each year.</div>
+      </div>
+      <div class="culture-card">
+        <div class="culture-name">Ethiopian</div>
+        <div class="culture-yr" id="yr-eth">2017 EE</div>
+        <div class="culture-desc">About 7–8 years behind the Gregorian calendar. Ethiopia celebrated the year 2000 in 2007 CE. Uses the ancient Alexandrian calendar with 13 months.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-title">Time is a human invention.</div>
+    <p class="footer-sub">The BC/CE system is one of many ways humanity has chosen to measure its place in history.</p>
+  </div>
+</footer>
+
+<script>
+// ── Data ──
+const events = [
+  { label: "Great Pyramid completed (~)", yr: 2560, era: "BC" },
+  { label: "Birth of Buddha (~)", yr: 563, era: "BC" },
+  { label: "Rome founded (traditional)", yr: 753, era: "BC" },
+  { label: "Battle of Marathon", yr: 490, era: "BC" },
+  { label: "Parthenon completed", yr: 432, era: "BC" },
+  { label: "Alexander the Great born", yr: 356, era: "BC" },
+  { label: "Julius Caesar assassinated", yr: 44, era: "BC" },
+  { label: "Muhammad born (~)", yr: 570, era: "CE" },
+  { label: "Magna Carta signed", yr: 1215, era: "CE" },
+  { label: "Gutenberg's printing press", yr: 1440, era: "CE" },
+  { label: "Galileo born", yr: 1564, era: "CE" },
+  { label: "American Declaration of Independence", yr: 1776, era: "CE" },
+  { label: "First photograph taken", yr: 1826, era: "CE" },
+  { label: "Moon landing", yr: 1969, era: "CE" },
+  { label: "World Wide Web invented", yr: 1991, era: "CE" },
+];
+
+let currentEra = 'BC';
+
+function toAbs(yr, era) {
+  return era === 'BC' ? -(parseInt(yr)) + 1 : parseInt(yr);
+}
+
+function setEra(era) {
+  currentEra = era;
+  document.getElementById('btn-bc').className = 'era-btn' + (era === 'BC' ? ' active-bc' : '');
+  document.getElementById('btn-ce').className = 'era-btn' + (era === 'CE' ? ' active-ce' : '');
+  updateResult();
+}
+
+function updateResult() {
+  const yr = parseInt(document.getElementById('yr-input').value) || 1;
+  const era = currentEra;
+  const abs = toAbs(yr, era);
+  const now = 2026;
+  const diff = now - abs;
+  const ago = diff > 0 ? Math.round(diff).toLocaleString() + ' years ago' : 'in the future';
+  const altEra = era === 'BC' ? 'BCE' : 'AD';
+  const altStr = era === 'BC' ? `${yr} BCE` : `AD ${yr}`;
+  const astroYr = abs;
+
+  document.getElementById('yr-result').innerHTML = `
+    <strong>${yr} ${era}</strong> can also be written <strong>${altStr}</strong><br>
+    Astronomical year: <strong>${astroYr}</strong><br>
+    From today: <span class="highlight">${ago}</span>
+  `;
+}
+
+function loadEvent(evt) {
+  document.getElementById('yr-input').value = evt.yr;
+  setEra(evt.era);
+}
+
+function buildEvents() {
+  const el = document.getElementById('events-list');
+  el.innerHTML = events.map((e, i) => `
+    <button class="evt-chip ${e.era === 'BC' ? 'bc-chip' : 'ce-chip'}" onclick='loadEvent(${JSON.stringify(e)})'>
+      <span class="evt-yr">${e.yr} ${e.era}</span>
+      <span class="evt-name">${e.label}</span>
+    </button>
+  `).join('');
+}
+
+function calcDist() {
+  const a = parseInt(document.getElementById('dA').value) || 1;
+  const ea = document.getElementById('eA').value;
+  const b = parseInt(document.getElementById('dB').value) || 1;
+  const eb = document.getElementById('eB').value;
+  const absA = toAbs(a, ea);
+  const absB = toAbs(b, eb);
+  const diff = Math.abs(absB - absA);
+  document.getElementById('dist-result').innerHTML =
+    `<span class="big-num">${diff.toLocaleString()}</span> years between ${a} ${ea} and ${b} ${eb}`;
+}
+
+// ── Dynamic calendar years ──
+function updateCalendars() {
+  const now = new Date();
+  const gY = now.getFullYear();
+  document.getElementById('yr-hijri').textContent = (Math.floor((gY - 622) * (33/32))).toLocaleString() + ' AH (~)';
+  document.getElementById('yr-hebrew').textContent = (gY + 3760).toLocaleString() + ' AM (~)';
+  document.getElementById('yr-saka').textContent = (gY - 78).toLocaleString() + ' SE';
+  document.getElementById('yr-reiwa').textContent = 'Reiwa ' + (gY - 2018);
+  document.getElementById('yr-eth').textContent = (gY - 7).toLocaleString() + ' EE (~)';
+}
+
+// ── Scroll reveal ──
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  els.forEach(el => obs.observe(el));
+}
+
+// ── Init ──
+buildEvents();
+updateResult();
+updateCalendars();
+calcDist();
+initReveal();
+
+document.getElementById('yr-input').addEventListener('input', updateResult);
+</script>
+</body>
+</html>
